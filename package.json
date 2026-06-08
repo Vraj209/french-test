@@ -1,0 +1,51 @@
+{
+  "name": "french-test-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prisma:generate": "prisma generate",
+    "prisma:validate": "prisma validate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:seed": "prisma db seed",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "@tanstack/react-query": "^5.90.0",
+    "@vercel/blob": "^2.1.0",
+    "bcryptjs": "^3.0.2",
+    "clsx": "^2.1.1",
+    "jose": "^6.1.0",
+    "lucide-react": "^0.555.0",
+    "next": "^16.0.7",
+    "openai": "^6.9.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.22",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "^16.0.7",
+    "postcss": "^8.5.6",
+    "prisma": "^6.19.0",
+    "tailwindcss": "^3.4.18",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}

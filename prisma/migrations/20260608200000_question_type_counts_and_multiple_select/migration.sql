@@ -1,0 +1,7 @@
+ALTER TYPE "QuestionType" ADD VALUE IF NOT EXISTS 'MULTIPLE_SELECT';
+
+ALTER TABLE "Test"
+  ADD COLUMN "questionTypeCounts" JSONB NOT NULL DEFAULT '{}';
+
+ALTER TABLE "PracticeSet"
+  ADD COLUMN "questionTypeCounts" JSONB NOT NULL DEFAULT '{}';

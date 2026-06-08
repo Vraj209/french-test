@@ -1,0 +1,604 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+enum CefrLevel {
+  A1
+  A2
+  B1
+  B2
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ExamType {
+  GENERAL
+  CEFR_PRACTICE
+  TEF_CANADA
+  TCF_CANADA
+  GENERAL_TEF
+  GENERAL_TCF
+}
+
+enum PreparationMode {
+  CEFR_GRAMMAR
+  TEF_CANADA_PRACTICE
+  TCF_CANADA_PRACTICE
+  WRITING_PRACTICE
+  SPEAKING_PRACTICE
+  MIXED_GRAMMAR_VOCABULARY
+  FULL_MOCK_EXAM
+}
+
+enum SkillFocus {
+  READING
+  LISTENING
+  WRITING
+  SPEAKING
+  GRAMMAR
+  VOCABULARY
+  MIXED
+}
+
+enum TargetScoreLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  CLB_NCLC_TARGET
+}
+
+enum ExamSection {
+  GENERAL_PRACTICE
+  TEF_READING
+  TEF_LISTENING
+  TEF_WRITING_A
+  TEF_WRITING_B
+  TEF_SPEAKING_A
+  TEF_SPEAKING_B
+  TCF_LISTENING
+  TCF_READING
+  TCF_WRITING_1
+  TCF_WRITING_2
+  TCF_WRITING_3
+  TCF_SPEAKING_1
+  TCF_SPEAKING_2
+  TCF_SPEAKING_3
+  TCF_LANGUAGE_STRUCTURES
+}
+
+enum QuestionType {
+  TRANSLATION
+  FILL_BLANK
+  CORRECT_INCORRECT
+  MULTIPLE_CHOICE
+  MULTIPLE_SELECT
+  VERB_CONJUGATION
+  SENTENCE_TRANSFORMATION
+  SHORT_WRITING
+  TOPIC_WRITING
+  SPEAKING_PREP
+}
+
+enum TestStatus {
+  GENERATED
+  IN_PROGRESS
+  SUBMITTED
+  EVALUATED
+}
+
+enum SourceKind {
+  CEFR_OFFICIAL
+  OPEN_REFERENCE
+  USER_SEED
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  name               String?
+  email              String              @unique
+  passwordCredential PasswordCredential?
+  tests              Test[]
+  answers            UserAnswer[]
+  uploadedImages     UploadedImage[]
+  results            TestResult[]
+  practiceSets       PracticeSet[]
+  mockExams          MockExam[]
+  scoreReports       ScoreReport[]
+  studyPlans         StudyPlan[]
+  progress           UserProgress[]
+  mistakeLogs        MistakeLog[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+model PasswordCredential {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Level {
+  id                 String              @id @default(cuid())
+  code               CefrLevel           @unique
+  name               String
+  description        String
+  cefrSummary        String
+  grammarTopics      GrammarTopic[]
+  vocabularySections VocabularySection[]
+  lessons            Lesson[]
+  sourceReferences   SourceReference[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+model GrammarTopic {
+  id               String            @id @default(cuid())
+  levelCode        CefrLevel
+  level            Level             @relation(fields: [levelCode], references: [code], onDelete: Cascade)
+  name             String
+  slug             String
+  description      String?
+  lessons          Lesson[]
+  questions        TestQuestion[]
+  sourceReferences SourceReference[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@unique([levelCode, slug])
+  @@index([levelCode])
+}
+
+model VocabularySection {
+  id               String            @id @default(cuid())
+  levelCode        CefrLevel
+  level            Level             @relation(fields: [levelCode], references: [code], onDelete: Cascade)
+  name             String
+  slug             String
+  description      String?
+  words            Json?
+  sourceReferences SourceReference[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@unique([levelCode, slug])
+  @@index([levelCode])
+}
+
+model VocabularyTheme {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  terms       Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Skill {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Lesson {
+  id               String            @id @default(cuid())
+  levelCode        CefrLevel
+  level            Level             @relation(fields: [levelCode], references: [code], onDelete: Cascade)
+  title            String
+  slug             String
+  content          String
+  cefrCanDo        Json?
+  grammarTopicId   String?
+  grammarTopic     GrammarTopic?     @relation(fields: [grammarTopicId], references: [id], onDelete: SetNull)
+  sourceReferences SourceReference[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@unique([levelCode, slug])
+  @@index([levelCode])
+}
+
+model Test {
+  id                         String           @id @default(cuid())
+  userId                     String
+  user                       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  practiceSetId              String?
+  practiceSet                PracticeSet?     @relation(fields: [practiceSetId], references: [id], onDelete: SetNull)
+  title                      String
+  level                      CefrLevel
+  examType                   ExamType         @default(GENERAL)
+  preparationMode            PreparationMode  @default(TEF_CANADA_PRACTICE)
+  examSections               Json             @default("[]")
+  targetScoreLevel           TargetScoreLevel @default(CLB_NCLC_TARGET)
+  targetNclc                 String?
+  skillFocus                 SkillFocus       @default(MIXED)
+  questionFocuses            Json             @default("[]")
+  timeLimitSeconds           Int?
+  fullTest                   Boolean          @default(false)
+  totalMarks                 Int
+  difficulty                 Difficulty
+  questionTypes              Json
+  questionTypeCounts         Json             @default("{}")
+  selectedGrammarTopics      Json
+  selectedVocabularySections Json
+  numberOfQuestions          Int
+  status                     TestStatus       @default(GENERATED)
+  questions                  TestQuestion[]
+  answers                    UserAnswer[]
+  uploadedImages             UploadedImage[]
+  result                     TestResult?
+  mockExam                   MockExam?
+  mistakeLogs                MistakeLog[]
+  createdAt                  DateTime         @default(now())
+  updatedAt                  DateTime         @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([level])
+  @@index([examType, preparationMode])
+}
+
+model TestQuestion {
+  id                String               @id @default(cuid())
+  testId            String
+  test              Test                 @relation(fields: [testId], references: [id], onDelete: Cascade)
+  grammarTopicId    String?
+  grammarTopic      GrammarTopic?        @relation(fields: [grammarTopicId], references: [id], onDelete: SetNull)
+  type              QuestionType
+  level             CefrLevel
+  examType          ExamType             @default(GENERAL)
+  examSection       ExamSection          @default(GENERAL_PRACTICE)
+  skill             SkillFocus           @default(MIXED)
+  topic             String
+  vocabularyTheme   String?
+  questionTypeFocus String?
+  question          String
+  instructions      String?
+  options           Json?
+  marks             Int
+  difficulty        Difficulty           @default(MEDIUM)
+  timeLimitSeconds  Int?
+  minWords          Int?
+  expectedAnswer    String
+  evaluationRule    String?
+  evaluationRubric  Json?
+  hint              String?
+  position          Int
+  answers           UserAnswer[]
+  feedback          EvaluationFeedback[]
+  mistakeLogs       MistakeLog[]
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  @@index([testId, position])
+  @@index([type])
+  @@index([examType, examSection])
+  @@index([skill])
+}
+
+model UserAnswer {
+  id                 String              @id @default(cuid())
+  userId             String
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testId             String
+  test               Test                @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questionId         String
+  question           TestQuestion        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answerText         String
+  extractedText      String?
+  imageId            String?
+  image              UploadedImage?      @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  awardedMarks       Float?
+  feedback           Json?
+  writingEvaluation  WritingEvaluation?
+  speakingEvaluation SpeakingEvaluation?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  @@unique([testId, questionId])
+  @@index([userId, createdAt])
+}
+
+model UploadedImage {
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testId        String
+  test          Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
+  url           String
+  pathname      String
+  contentType   String
+  size          Int
+  extractedText String?
+  answers       UserAnswer[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([userId, createdAt])
+}
+
+model TestResult {
+  id                    String               @id @default(cuid())
+  testId                String               @unique
+  test                  Test                 @relation(fields: [testId], references: [id], onDelete: Cascade)
+  userId                String
+  user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalMarks            Int
+  awardedMarks          Float
+  percentage            Float
+  cefrFeedback          String
+  overallFeedback       String
+  strengths             Json
+  weaknesses            Json
+  recommendedTopics     Json
+  personalizedStudyPlan Json
+  nclcEstimate          Json?
+  examFeedback          Json?
+  detailedEvaluation    Json
+  questionFeedback      EvaluationFeedback[]
+  scoreReport           ScoreReport?
+  studyPlans            StudyPlan[]
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  @@index([userId, createdAt])
+}
+
+model EvaluationFeedback {
+  id                    String       @id @default(cuid())
+  testResultId          String
+  testResult            TestResult   @relation(fields: [testResultId], references: [id], onDelete: Cascade)
+  questionId            String
+  question              TestQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  isCorrect             Boolean
+  awardedMarks          Float
+  maximumMarks          Int
+  estimatedLevel        String?
+  correctAnswer         String
+  mistakeExplanation    String
+  grammarExplanation    String
+  vocabularyCorrection  String
+  improvedVersion       String
+  modelAnswer           String       @default("")
+  simpleFeedback        String
+  frenchExplanation     String?
+  strongPoints          Json         @default("[]")
+  weakPoints            Json         @default("[]")
+  grammarTopicsToRevise Json         @default("[]")
+  vocabularyToLearn     Json         @default("[]")
+  examStrategyTip       String       @default("")
+  suggestedTopics       Json
+  createdAt             DateTime     @default(now())
+
+  @@unique([testResultId, questionId])
+}
+
+model PracticeSet {
+  id                 String           @id @default(cuid())
+  userId             String?
+  user               User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title              String
+  examType           ExamType         @default(TEF_CANADA)
+  preparationMode    PreparationMode  @default(TEF_CANADA_PRACTICE)
+  skillFocus         SkillFocus       @default(MIXED)
+  level              CefrLevel
+  targetScoreLevel   TargetScoreLevel @default(CLB_NCLC_TARGET)
+  targetNclc         String?
+  grammarTopics      Json             @default("[]")
+  vocabularyThemes   Json             @default("[]")
+  questionFocuses    Json             @default("[]")
+  questionTypeCounts Json             @default("{}")
+  totalMarks         Int
+  numberOfQuestions  Int
+  timeLimitSeconds   Int?
+  difficulty         Difficulty       @default(MEDIUM)
+  source             String?
+  tests              Test[]
+  studyPlans         StudyPlan[]      @relation("NextPracticeSet")
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([examType, preparationMode])
+}
+
+model MockExam {
+  id               String            @id @default(cuid())
+  userId           String
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testId           String?           @unique
+  test             Test?             @relation(fields: [testId], references: [id], onDelete: SetNull)
+  title            String
+  examType         ExamType
+  level            CefrLevel
+  targetNclc       String?
+  totalMarks       Int
+  timeLimitSeconds Int
+  status           TestStatus        @default(GENERATED)
+  sections         MockExamSection[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([examType, status])
+}
+
+model MockExamSection {
+  id               String      @id @default(cuid())
+  mockExamId       String
+  mockExam         MockExam    @relation(fields: [mockExamId], references: [id], onDelete: Cascade)
+  examSection      ExamSection
+  skillFocus       SkillFocus
+  questionCount    Int
+  marks            Int
+  timeLimitSeconds Int
+  status           TestStatus  @default(GENERATED)
+  score            Float?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  @@index([mockExamId, examSection])
+}
+
+model WritingEvaluation {
+  id                String     @id @default(cuid())
+  userAnswerId      String     @unique
+  userAnswer        UserAnswer @relation(fields: [userAnswerId], references: [id], onDelete: Cascade)
+  taskCompletion    Float?
+  relevance         Float?
+  grammarAccuracy   Float?
+  vocabularyRange   Float?
+  coherenceCohesion Float?
+  registerControl   Float?
+  correctedVersion  String
+  modelAnswer       String
+  estimatedCefr     String?
+  estimatedClb      String?
+  strategyTip       String
+  rubric            Json       @default("[]")
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+model SpeakingEvaluation {
+  id                 String     @id @default(cuid())
+  userAnswerId       String     @unique
+  userAnswer         UserAnswer @relation(fields: [userAnswerId], references: [id], onDelete: Cascade)
+  taskCompletion     Float?
+  fluency            Float?
+  grammarAccuracy    Float?
+  vocabularyRange    Float?
+  pronunciationNotes String?
+  interactionQuality Float?
+  argumentQuality    Float?
+  improvedResponse   String
+  modelAnswer        String
+  estimatedCefr      String?
+  estimatedClb       String?
+  strategyTip        String
+  rubric             Json       @default("[]")
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+}
+
+model ScoreReport {
+  id                   String      @id @default(cuid())
+  userId               String
+  user                 User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testResultId         String?     @unique
+  testResult           TestResult? @relation(fields: [testResultId], references: [id], onDelete: Cascade)
+  totalScore           Float
+  maxScore             Int
+  sectionScores        Json        @default("{}")
+  estimatedCEFR        String?
+  estimatedCLB         String?
+  grammarWeaknesses    Json        @default("[]")
+  vocabularyWeaknesses Json        @default("[]")
+  writingWeaknesses    Json        @default("[]")
+  speakingWeaknesses   Json        @default("[]")
+  recommendedLessons   Json        @default("[]")
+  nextPracticeSet      Json?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  @@index([userId, createdAt])
+}
+
+model StudyPlan {
+  id                   String       @id @default(cuid())
+  userId               String
+  user                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testResultId         String?
+  testResult           TestResult?  @relation(fields: [testResultId], references: [id], onDelete: SetNull)
+  nextPracticeSetId    String?
+  nextPracticeSet      PracticeSet? @relation("NextPracticeSet", fields: [nextPracticeSetId], references: [id], onDelete: SetNull)
+  title                String
+  grammarWeaknesses    Json         @default("[]")
+  vocabularyWeaknesses Json         @default("[]")
+  writingWeaknesses    Json         @default("[]")
+  speakingWeaknesses   Json         @default("[]")
+  recommendedLessons   Json         @default("[]")
+  strategyTips         Json         @default("[]")
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  @@index([userId, createdAt])
+}
+
+model UserProgress {
+  id                String     @id @default(cuid())
+  userId            String
+  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level             CefrLevel
+  examType          ExamType   @default(TEF_CANADA)
+  skillFocus        SkillFocus
+  attempts          Int        @default(0)
+  averagePercentage Float      @default(0)
+  strongestTopics   Json       @default("[]")
+  weakestTopics     Json       @default("[]")
+  vocabularyGaps    Json       @default("[]")
+  lastPracticedAt   DateTime?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  @@unique([userId, level, examType, skillFocus])
+  @@index([userId, updatedAt])
+}
+
+model MistakeLog {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testId          String?
+  test            Test?         @relation(fields: [testId], references: [id], onDelete: SetNull)
+  questionId      String?
+  question        TestQuestion? @relation(fields: [questionId], references: [id], onDelete: SetNull)
+  skillFocus      SkillFocus    @default(MIXED)
+  grammarTopic    String?
+  vocabularyTheme String?
+  mistakeType     String
+  originalAnswer  String
+  correction      String
+  strategyTip     String?
+  createdAt       DateTime      @default(now())
+
+  @@index([userId, createdAt])
+  @@index([grammarTopic])
+  @@index([vocabularyTheme])
+}
+
+model SourceReference {
+  id                  String             @id @default(cuid())
+  kind                SourceKind
+  title               String
+  url                 String?
+  citation            String?
+  levelCode           CefrLevel?
+  level               Level?             @relation(fields: [levelCode], references: [code], onDelete: SetNull)
+  grammarTopicId      String?
+  grammarTopic        GrammarTopic?      @relation(fields: [grammarTopicId], references: [id], onDelete: SetNull)
+  vocabularySectionId String?
+  vocabularySection   VocabularySection? @relation(fields: [vocabularySectionId], references: [id], onDelete: SetNull)
+  lessonId            String?
+  lesson              Lesson?            @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  createdAt           DateTime           @default(now())
+
+  @@unique([kind, title])
+  @@index([kind])
+  @@index([levelCode])
+}
