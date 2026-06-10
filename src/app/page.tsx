@@ -191,46 +191,45 @@ export default async function HomePage() {
     <div className="min-h-screen overflow-x-hidden bg-exam-50">
       <PublicHeader signedIn={Boolean(user)} />
       <main className="min-w-0">
-        <section className="hero-ribbon-stage relative overflow-hidden border-b border-exam-100 bg-white">
+        <section className="hero-ribbon-stage relative flex min-h-[calc(100svh-4rem)] overflow-hidden border-b border-exam-100 bg-white">
           <div className="hero-ribbon-field" aria-hidden="true">
             <span className="hero-ribbon hero-ribbon-blue" />
             <span className="hero-ribbon hero-ribbon-red" />
             <span className="hero-ribbon hero-ribbon-green" />
             <span className="hero-ribbon hero-ribbon-light" />
           </div>
-          <div className="relative z-10 mx-auto min-w-0 max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-            <div className="min-w-0 max-w-4xl">
-              <p className="text-xs font-bold uppercase tracking-wide text-exam-700">
+          <div className="relative z-10 mx-auto flex w-full min-w-0 flex-col justify-center px-4 py-12 sm:px-6 lg:px-12 lg:py-16">
+            <div className="min-w-0 max-w-7xl">
+              <p className="text-xs font-bold uppercase tracking-wide text-exam-700 sm:text-sm">
                 TEF Canada and TCF Canada preparation
               </p>
-              <h1 className="mt-3 text-4xl font-bold leading-tight text-ink-950 sm:text-5xl lg:text-6xl">
+              <h1 className="mt-4 text-4xl font-bold leading-tight text-ink-950 sm:text-5xl lg:text-6xl">
                 TEF/TCF French exam practice
               </h1>
-              <p className="mt-5 min-w-0 max-w-3xl text-base leading-7 text-ink-600 sm:text-lg">
+              <p className="mt-6 min-w-0 max-w-[21rem] text-base leading-7 text-ink-600 sm:max-w-4xl sm:text-lg sm:leading-8 lg:text-xl lg:leading-9">
                 Generate focused French practice, answer like the real exam, and get
                 estimated scores with clear feedback for what to improve next.
               </p>
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href={primaryHref}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-exam-700 px-5 text-sm font-semibold text-white transition hover:bg-exam-500 focus:outline-none focus:ring-2 focus:ring-exam-500 focus:ring-offset-2"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-exam-700 px-6 text-sm font-semibold text-white transition hover:bg-exam-500 focus:outline-none focus:ring-2 focus:ring-exam-500 focus:ring-offset-2 sm:h-14 sm:px-8 sm:text-base"
                 >
                   Start practice
-                  <ArrowRight size={16} aria-hidden="true" />
+                  <ArrowRight size={20} aria-hidden="true" />
                 </Link>
                 <Link
                   href={dashboardHref}
-                  className="inline-flex h-11 items-center justify-center rounded-md border border-exam-100 bg-white px-5 text-sm font-semibold text-ink-800 transition hover:bg-exam-50 focus:outline-none focus:ring-2 focus:ring-exam-500 focus:ring-offset-2"
+                  className="inline-flex h-12 items-center justify-center rounded-md border border-exam-100 bg-white px-6 text-sm font-semibold text-ink-800 transition hover:bg-exam-50 focus:outline-none focus:ring-2 focus:ring-exam-500 focus:ring-offset-2 sm:h-14 sm:px-8 sm:text-base"
                 >
                   {user ? "View dashboard" : "Sign in"}
                 </Link>
               </div>
-              <div className="mt-7 grid gap-2 text-sm font-semibold text-ink-800 sm:grid-cols-3">
+              <div className="mt-10 grid gap-4 text-sm font-semibold text-ink-800 sm:text-base lg:grid-cols-3 lg:text-lg">
                 {proofPoints.map((point) => (
-                  <div key={point} className="flex items-start gap-2">
+                  <div key={point} className="flex items-start gap-3">
                     <CheckCircle2
-                      className="mt-0.5 shrink-0 text-verdict-700"
-                      size={17}
+                      className="mt-0.5 h-5 w-5 shrink-0 text-verdict-700 lg:h-6 lg:w-6"
                       aria-hidden="true"
                     />
                     <span className="min-w-0 break-words">{point}</span>
@@ -238,91 +237,93 @@ export default async function HomePage() {
                 ))}
               </div>
             </div>
+          </div>
+        </section>
 
-            <div className="mt-10 min-w-0 max-w-full overflow-hidden rounded-lg border border-exam-100 bg-white/95 shadow-panel backdrop-blur-sm">
-              <div className="grid min-w-0 gap-0 lg:grid-cols-[0.95fr_1.05fr]">
-                <div className="min-w-0 border-b border-exam-100 bg-exam-50 px-5 py-5 lg:border-b-0 lg:border-r">
-                  <div className="flex min-w-0 items-center justify-between gap-4">
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold uppercase tracking-wide text-exam-700">
-                        Practice builder
-                      </p>
-                      <h2 className="mt-1 text-xl font-bold text-ink-950">
-                        Build the exact session you need
-                      </h2>
-                    </div>
-                    <span className="rounded-md bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-exam-700 ring-1 ring-exam-100">
-                      Ready
-                    </span>
+        <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="min-w-0 max-w-full overflow-hidden rounded-lg border border-exam-100 bg-white/95 shadow-panel backdrop-blur-sm">
+            <div className="grid min-w-0 gap-0 lg:grid-cols-[0.95fr_1.05fr]">
+              <div className="min-w-0 border-b border-exam-100 bg-exam-50 px-5 py-5 lg:border-b-0 lg:border-r">
+                <div className="flex min-w-0 items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold uppercase tracking-wide text-exam-700">
+                      Practice builder
+                    </p>
+                    <h2 className="mt-1 text-xl font-bold text-ink-950">
+                      Build the exact session you need
+                    </h2>
                   </div>
-                  <div className="mt-5 min-w-0 divide-y divide-exam-100 rounded-md border border-exam-100 bg-white">
-                    {previewRows.map((row) => (
+                  <span className="rounded-md bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-exam-700 ring-1 ring-exam-100">
+                    Ready
+                  </span>
+                </div>
+                <div className="mt-5 min-w-0 divide-y divide-exam-100 rounded-md border border-exam-100 bg-white">
+                  {previewRows.map((row) => (
+                    <div
+                      key={row.label}
+                      className="grid min-w-0 gap-1 px-4 py-3 sm:grid-cols-[8rem_1fr]"
+                    >
+                      <span className="text-xs font-bold uppercase tracking-wide text-ink-600">
+                        {row.label}
+                      </span>
+                      <span className="min-w-0 break-words text-sm font-semibold text-ink-950">
+                        {row.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="min-w-0 px-5 py-5">
+                <p className="text-xs font-bold uppercase tracking-wide text-exam-700">
+                  Result preview
+                </p>
+                <div className="mt-4 grid min-w-0 gap-4 sm:grid-cols-[9rem_1fr]">
+                  <div className="min-w-0 rounded-md border border-exam-100 bg-exam-50 p-4 text-center">
+                    <p className="text-3xl font-bold text-ink-950">82%</p>
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-600">
+                      Estimated
+                    </p>
+                    <p className="mt-3 text-sm font-semibold text-verdict-700">
+                      Strong B2 range
+                    </p>
+                  </div>
+                  <div className="min-w-0 space-y-3">
+                    {[
+                      "Add more connectors to show contrast and consequence.",
+                      "Tighten verb agreement in complex sentences.",
+                      "Use a clearer final recommendation in the conclusion."
+                    ].map((item) => (
                       <div
-                        key={row.label}
-                        className="grid min-w-0 gap-1 px-4 py-3 sm:grid-cols-[8rem_1fr]"
+                        key={item}
+                        className="flex min-w-0 gap-3 rounded-md border border-exam-100 px-3 py-3"
                       >
-                        <span className="text-xs font-bold uppercase tracking-wide text-ink-600">
-                          {row.label}
-                        </span>
-                        <span className="min-w-0 break-words text-sm font-semibold text-ink-950">
-                          {row.value}
-                        </span>
+                        <CheckCircle2
+                          className="mt-0.5 shrink-0 text-verdict-700"
+                          size={17}
+                          aria-hidden="true"
+                        />
+                        <p className="min-w-0 break-words text-sm leading-6 text-ink-600">
+                          {item}
+                        </p>
                       </div>
                     ))}
                   </div>
                 </div>
-
-                <div className="min-w-0 px-5 py-5">
-                  <p className="text-xs font-bold uppercase tracking-wide text-exam-700">
-                    Result preview
-                  </p>
-                  <div className="mt-4 grid min-w-0 gap-4 sm:grid-cols-[9rem_1fr]">
-                    <div className="min-w-0 rounded-md border border-exam-100 bg-exam-50 p-4 text-center">
-                      <p className="text-3xl font-bold text-ink-950">82%</p>
-                      <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-600">
-                        Estimated
-                      </p>
-                      <p className="mt-3 text-sm font-semibold text-verdict-700">
-                        Strong B2 range
-                      </p>
-                    </div>
-                    <div className="min-w-0 space-y-3">
-                      {[
-                        "Add more connectors to show contrast and consequence.",
-                        "Tighten verb agreement in complex sentences.",
-                        "Use a clearer final recommendation in the conclusion."
-                      ].map((item) => (
-                        <div
-                          key={item}
-                          className="flex min-w-0 gap-3 rounded-md border border-exam-100 px-3 py-3"
-                        >
-                          <CheckCircle2
-                            className="mt-0.5 shrink-0 text-verdict-700"
-                            size={17}
-                            aria-hidden="true"
-                          />
-                          <p className="min-w-0 break-words text-sm leading-6 text-ink-600">
-                            {item}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
+          </div>
 
-            <div className="mt-4 grid min-w-0 gap-3 sm:grid-cols-3">
-              {stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="min-w-0 rounded-md border border-exam-100 bg-white/95 px-4 py-4 shadow-panel backdrop-blur-sm"
-                >
-                  <p className="text-2xl font-bold text-exam-700">{stat.value}</p>
-                  <p className="mt-1 text-sm text-ink-600">{stat.label}</p>
-                </div>
-              ))}
-            </div>
+          <div className="mt-4 grid min-w-0 gap-3 sm:grid-cols-3">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="min-w-0 rounded-md border border-exam-100 bg-white/95 px-4 py-4 shadow-panel backdrop-blur-sm"
+              >
+                <p className="text-2xl font-bold text-exam-700">{stat.value}</p>
+                <p className="mt-1 text-sm text-ink-600">{stat.label}</p>
+              </div>
+            ))}
           </div>
         </section>
 
