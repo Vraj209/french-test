@@ -1,17 +1,33 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { PublicHeader } from "@/components/layout/public-header";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
+import {
+  buildBreadcrumbJsonLd,
+  buildItemListJsonLd,
+  buildMetadata
+} from "@/lib/seo";
+
+export const metadata: Metadata = buildMetadata({
+  title: "French Grammar For TEF, TCF, and NCLC 7",
+  description:
+    "Browse A1 to B2 French grammar topics for TEF Canada, TCF Canada, NCLC 7 preparation, writing, speaking, and comprehension practice.",
+  path: "/grammar",
+  keywords: [
+    "French grammar",
+    "TEF grammar",
+    "TCF grammar",
+    "NCLC 7 French grammar",
+    "French grammar practice"
+  ]
+});
 
 export default async function GrammarPage() {
   const user = await getCurrentUser();
-
-  if (!user) {
-    redirect("/login");
-  }
 
   const levels = await prisma.level.findMany({
     orderBy: { code: "asc" },
@@ -21,20 +37,38 @@ export default async function GrammarPage() {
       }
     }
   });
+  const topicItems = levels.flatMap((level) =>
+    level.grammarTopics.map((topic) => ({
+      name: `${topic.name} (${level.code})`,
+      description: topic.description,
+      path: `/lessons/grammar/${level.code.toLowerCase()}/${topic.slug}`
+    }))
+  );
 
   return (
     <div className="min-h-screen bg-exam-50">
       <PublicHeader signedIn={Boolean(user)} />
+      <JsonLd
+        id="grammar-structured-data"
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "French grammar", path: "/grammar" }
+          ]),
+          buildItemListJsonLd(topicItems)
+        ]}
+      />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6">
           <p className="text-xs font-bold uppercase tracking-wide text-exam-700">
             Grammar catalog
           </p>
           <h1 className="mt-1 text-2xl font-bold text-ink-950">
-            Grammar topics by CEFR level
+            French grammar topics by CEFR level
           </h1>
           <p className="mt-2 text-sm leading-6 text-ink-600">
-            Use these topics to target TEF/TCF writing, speaking, and comprehension gaps.
+            Use these topics to target TEF Canada, TCF Canada, writing,
+            speaking, comprehension, and NCLC 7 readiness gaps.
           </p>
         </div>
         <div className="grid gap-4 lg:grid-cols-2">

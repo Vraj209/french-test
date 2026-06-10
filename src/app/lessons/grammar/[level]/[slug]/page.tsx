@@ -1,12 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { PublicHeader } from "@/components/layout/public-header";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
 import { buildGrammarCheatSheet } from "@/lib/lesson-cheatsheets";
 import { cefrLevelSchema, type CefrLevel } from "@/lib/schemas";
+import {
+  buildBreadcrumbJsonLd,
+  buildLearningResourceJsonLd,
+  buildMetadata
+} from "@/lib/seo";
 
 type PageProps = {
   params: Promise<{ level: string; slug: string }>;
@@ -24,13 +31,50 @@ function stringArray(value: unknown): string[] {
     : [];
 }
 
-export default async function GrammarCheatSheetPage({ params }: PageProps) {
-  const user = await getCurrentUser();
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { level: levelParam, slug } = await params;
+  const level = parseLevel(levelParam);
 
-  if (!user) {
-    redirect("/login");
+  if (!level) {
+    return buildMetadata({
+      title: "French Grammar Cheat Sheet",
+      description:
+        "French grammar cheat sheets for TEF Canada, TCF Canada, and NCLC preparation.",
+      path: `/lessons/grammar/${levelParam}/${slug}`
+    });
   }
 
+  const topic = await prisma.grammarTopic.findUnique({
+    where: {
+      levelCode_slug: {
+        levelCode: level,
+        slug
+      }
+    },
+    select: {
+      name: true,
+      description: true
+    }
+  });
+
+  return buildMetadata({
+    title: topic ? `${topic.name} French Grammar Cheat Sheet` : "French Grammar Cheat Sheet",
+    description:
+      topic?.description ||
+      "French grammar cheat sheets for TEF Canada, TCF Canada, and NCLC preparation.",
+    path: `/lessons/grammar/${level.toLowerCase()}/${slug}`,
+    keywords: [
+      `${topic?.name || "French grammar"} practice`,
+      "French grammar",
+      "TEF grammar",
+      "TCF grammar",
+      "NCLC French"
+    ]
+  });
+}
+
+export default async function GrammarCheatSheetPage({ params }: PageProps) {
+  const user = await getCurrentUser();
   const { level: levelParam, slug } = await params;
   const level = parseLevel(levelParam);
 
@@ -65,6 +109,29 @@ export default async function GrammarCheatSheetPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-exam-50">
       <PublicHeader signedIn={Boolean(user)} />
+      <JsonLd
+        id="grammar-lesson-structured-data"
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "French grammar", path: "/grammar" },
+            {
+              name: topic.name,
+              path: `/lessons/grammar/${level.toLowerCase()}/${topic.slug}`
+            }
+          ]),
+          buildLearningResourceJsonLd({
+            name: `${topic.name} French grammar cheat sheet`,
+            description:
+              topic.description ||
+              `${topic.name} grammar practice for TEF Canada, TCF Canada, and NCLC preparation.`,
+            path: `/lessons/grammar/${level.toLowerCase()}/${topic.slug}`,
+            educationalLevel: topic.levelCode,
+            about: ["French grammar", "TEF Canada", "TCF Canada", "NCLC preparation"],
+            learningResourceType: "Cheat sheet"
+          })
+        ]}
+      />
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6">
           <Link

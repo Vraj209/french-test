@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldError, Input, Label } from "@/components/ui/form";
+import { PasswordInput } from "@/features/auth/password-input";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -50,10 +51,9 @@ export function RegisterForm() {
       </div>
       <div>
         <Label htmlFor="password">Password</Label>
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           minLength={8}
           autoComplete="new-password"
           required

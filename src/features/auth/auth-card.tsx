@@ -19,8 +19,14 @@ export function AuthCard({
   children
 }: AuthCardProps) {
   return (
-    <main className="exam-grid flex min-h-screen items-center justify-center px-4 py-10">
-      <section className="w-full max-w-md rounded-lg border border-exam-100 bg-white shadow-panel">
+    <main className="hero-ribbon-stage relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-4 py-10">
+      <div className="hero-ribbon-field" aria-hidden="true">
+        <span className="hero-ribbon hero-ribbon-blue" />
+        <span className="hero-ribbon hero-ribbon-red" />
+        <span className="hero-ribbon hero-ribbon-green" />
+        <span className="hero-ribbon hero-ribbon-light" />
+      </div>
+      <section className="relative z-10 w-full max-w-md rounded-lg border border-exam-100 bg-white/95 shadow-panel backdrop-blur-sm">
         <div className="border-b border-exam-100 px-6 py-5">
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-md bg-exam-700 text-white">
@@ -28,7 +34,7 @@ export function AuthCard({
             </span>
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-exam-700">
-                French Test AI
+                Francivo
               </p>
               <h1 className="text-xl font-bold text-ink-950">{title}</h1>
             </div>

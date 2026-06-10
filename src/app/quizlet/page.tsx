@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import {
   ArrowUpRight,
   BookOpenText,
@@ -11,7 +10,13 @@ import {
   type LucideIcon
 } from "lucide-react";
 import { PublicHeader } from "@/components/layout/public-header";
+import { JsonLd } from "@/components/seo/json-ld";
 import { getCurrentUser } from "@/lib/auth/session";
+import {
+  buildBreadcrumbJsonLd,
+  buildLearningResourceJsonLd,
+  buildMetadata
+} from "@/lib/seo";
 
 type QuizletFolder = {
   title: string;
@@ -60,20 +65,43 @@ const quizletFolders: QuizletFolder[] = [
 ];
 
 export const metadata: Metadata = {
-  title: "Quizlet Folders | French Test AI",
-  description: "Quizlet folders for French vocabulary, grammar, listening, writing, and speaking practice."
+  ...buildMetadata({
+    title: "French Quizlet Folders For TEF and TCF Practice",
+    description:
+      "Quizlet folders for French vocabulary, grammar, listening, writing, and speaking practice for TEF Canada, TCF Canada, and NCLC preparation.",
+    path: "/quizlet",
+    keywords: [
+      "French Quizlet",
+      "TEF vocabulary",
+      "TCF vocabulary",
+      "French grammar Quizlet",
+      "NCLC French vocabulary"
+    ]
+  })
 };
 
 export default async function QuizletPage() {
   const user = await getCurrentUser();
 
-  if (!user) {
-    redirect("/login");
-  }
-
   return (
     <div className="min-h-screen bg-exam-50">
       <PublicHeader signedIn={Boolean(user)} />
+      <JsonLd
+        id="quizlet-structured-data"
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "French Quizlet folders", path: "/quizlet" }
+          ]),
+          buildLearningResourceJsonLd({
+            name: "French Quizlet folders for TEF and TCF practice",
+            description:
+              "External Quizlet folders for French vocabulary, grammar, listening, writing, and speaking review.",
+            path: "/quizlet",
+            about: ["French vocabulary", "French grammar", "TEF Canada", "TCF Canada"]
+          })
+        ]}
+      />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8 max-w-3xl">
           <p className="text-xs font-bold uppercase tracking-wide text-exam-700">

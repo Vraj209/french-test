@@ -1,6 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PublicHeader } from "@/components/layout/public-header";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -11,6 +13,11 @@ import {
   vocabularyUseCases
 } from "@/lib/lesson-cheatsheets";
 import { cefrLevelSchema, type CefrLevel } from "@/lib/schemas";
+import {
+  buildBreadcrumbJsonLd,
+  buildLearningResourceJsonLd,
+  buildMetadata
+} from "@/lib/seo";
 
 type PageProps = {
   params: Promise<{ level: string; slug: string }>;
@@ -20,6 +27,50 @@ function parseLevel(value: string): CefrLevel | null {
   const parsed = cefrLevelSchema.safeParse(value.toUpperCase());
 
   return parsed.success ? parsed.data : null;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { level: levelParam, slug } = await params;
+  const level = parseLevel(levelParam);
+
+  if (!level) {
+    return buildMetadata({
+      title: "French Vocabulary Cheat Sheet",
+      description:
+        "French vocabulary cheat sheets for TEF Canada, TCF Canada, and NCLC preparation.",
+      path: `/lessons/vocabulary/${levelParam}/${slug}`
+    });
+  }
+
+  const section = await prisma.vocabularySection.findUnique({
+    where: {
+      levelCode_slug: {
+        levelCode: level,
+        slug
+      }
+    },
+    select: {
+      name: true,
+      description: true
+    }
+  });
+
+  return buildMetadata({
+    title: section
+      ? `${section.name} French Vocabulary Cheat Sheet`
+      : "French Vocabulary Cheat Sheet",
+    description:
+      section?.description ||
+      "French vocabulary cheat sheets for TEF Canada, TCF Canada, and NCLC preparation.",
+    path: `/lessons/vocabulary/${level.toLowerCase()}/${slug}`,
+    keywords: [
+      `${section?.name || "French vocabulary"} vocabulary`,
+      "French vocabulary",
+      "TEF vocabulary",
+      "TCF vocabulary",
+      "NCLC French"
+    ]
+  });
 }
 
 export default async function VocabularyCheatSheetPage({ params }: PageProps) {
@@ -54,6 +105,29 @@ export default async function VocabularyCheatSheetPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-exam-50">
       <PublicHeader signedIn={Boolean(user)} />
+      <JsonLd
+        id="vocabulary-lesson-structured-data"
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "French vocabulary", path: "/lessons" },
+            {
+              name: section.name,
+              path: `/lessons/vocabulary/${level.toLowerCase()}/${section.slug}`
+            }
+          ]),
+          buildLearningResourceJsonLd({
+            name: `${section.name} French vocabulary cheat sheet`,
+            description:
+              section.description ||
+              `${section.name} vocabulary practice for TEF Canada, TCF Canada, and NCLC preparation.`,
+            path: `/lessons/vocabulary/${level.toLowerCase()}/${section.slug}`,
+            educationalLevel: section.levelCode,
+            about: ["French vocabulary", "TEF Canada", "TCF Canada", "NCLC preparation"],
+            learningResourceType: "Cheat sheet"
+          })
+        ]}
+      />
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6">
           <Link

@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { redirect } from "next/navigation";
 import { ArrowUpRight, BookOpenText, Headphones, Languages, LibraryBig, Sparkles } from "lucide-react";
 import { PublicHeader } from "@/components/layout/public-header";
+import { JsonLd } from "@/components/seo/json-ld";
 import { getCurrentUser } from "@/lib/auth/session";
+import {
+  buildBreadcrumbJsonLd,
+  buildLearningResourceJsonLd,
+  buildMetadata
+} from "@/lib/seo";
 
 type Resource = {
   name: string;
@@ -46,12 +51,11 @@ const resourceSections: ResourceSection[] = [
     icon: LibraryBig,
     resources: [
       { name: "Clozemaster French", href: "https://www.clozemaster.com/l/fra-eng/", domain: "clozemaster.com" },
-      { name: "Babadum", href: "https://babadum.com/", domain: "babadum.com" },
-      { name: "French Today", href: "https://www.frenchtoday.com/", domain: "frenchtoday.com" },
-      { name: "Knoword French", href: "https://knoword.com/packs?language=fr", domain: "knoword.com" },
+      { name: "WordDive French Grammar", href: "https://www.worddive.com/en/grammar/french-grammar/", domain: "worddive.com" },
       { name: "Le Point du FLE", href: "https://www.lepointdufle.net/p/francais-activites.htm", domain: "lepointdufle.net" },
       { name: "RFI Revision", href: "https://francaisfacile.rfi.fr/fr/r%C3%A9viser/", domain: "francaisfacile.rfi.fr" },
-      { name: "WordDive French Grammar", href: "https://www.worddive.com/en/grammar/french-grammar/", domain: "worddive.com" }
+      { name: "Babadum", href: "https://babadum.com/", domain: "babadum.com" },
+      { name: "Knoword French", href: "https://knoword.com/packs?language=fr", domain: "knoword.com" },
     ]
   },
   {
@@ -71,14 +75,27 @@ const resourceSections: ResourceSection[] = [
     resources: [
       { name: "Le Francais des Affaires", href: "https://www.lefrancaisdesaffaires.fr/", domain: "lefrancaisdesaffaires.fr" },
       { name: "The Perfect French Grammar", href: "https://theperfectfrench.com/french-courses-book/complete-french-grammar/", domain: "theperfectfrench.com" },
-      { name: "Learn French with Clemence", href: "https://www.learnfrenchwithclemence.com/course-curriculum", domain: "learnfrenchwithclemence.com" }
+      { name: "Learn French with Clemence", href: "https://www.learnfrenchwithclemence.com/course-curriculum", domain: "learnfrenchwithclemence.com" },
+      { name: "DeepL", href: "https://www.deepl.com/en", domain: "deepl.com" },
+      { name: "Reverso", href: "https://www.reverso.net/text-translation", domain: "reverso.net" }
     ]
   }
 ];
 
 export const metadata: Metadata = {
-  title: "Useful French Resources | French Test AI",
-  description: "Curated French listening, reading, grammar, immersion, and extra study resources."
+  ...buildMetadata({
+    title: "French Learning Resources For TEF and TCF",
+    description:
+      "Curated French listening, reading, grammar, immersion, and study resources to support TEF Canada, TCF Canada, and NCLC 7 preparation.",
+    path: "/resources",
+    keywords: [
+      "French learning resources",
+      "TEF Canada resources",
+      "TCF Canada resources",
+      "French listening practice",
+      "French reading practice"
+    ]
+  })
 };
 
 function logoUrl(domain: string) {
@@ -88,13 +105,25 @@ function logoUrl(domain: string) {
 export default async function ResourcesPage() {
   const user = await getCurrentUser();
 
-  if (!user) {
-    redirect("/login");
-  }
-
   return (
     <div className="min-h-screen bg-exam-50">
       <PublicHeader signedIn={Boolean(user)} />
+      <JsonLd
+        id="resources-structured-data"
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "French resources", path: "/resources" }
+          ]),
+          buildLearningResourceJsonLd({
+            name: "French learning resources for TEF and TCF",
+            description:
+              "A curated resource hub for French listening, reading, grammar, immersion, and TEF/TCF preparation.",
+            path: "/resources",
+            about: ["French learning", "TEF Canada", "TCF Canada", "NCLC 7"]
+          })
+        ]}
+      />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8 max-w-3xl">
           <p className="text-xs font-bold uppercase tracking-wide text-exam-700">

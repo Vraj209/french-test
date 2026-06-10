@@ -1,9 +1,30 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PublicHeader } from "@/components/layout/public-header";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
+import {
+  buildBreadcrumbJsonLd,
+  buildItemListJsonLd,
+  buildMetadata
+} from "@/lib/seo";
+
+export const metadata: Metadata = buildMetadata({
+  title: "French Vocabulary Cheat Sheets For TEF and TCF",
+  description:
+    "Review A1 to B2 French vocabulary cheat sheets by theme for TEF Canada, TCF Canada, French learning, and NCLC preparation.",
+  path: "/lessons",
+  keywords: [
+    "French vocabulary",
+    "TEF vocabulary",
+    "TCF vocabulary",
+    "French vocabulary cheat sheets",
+    "NCLC French vocabulary"
+  ]
+});
 
 export default async function LessonsPage() {
   const user = await getCurrentUser();
@@ -15,10 +36,27 @@ export default async function LessonsPage() {
       }
     }
   });
+  const sectionItems = levels.flatMap((level) =>
+    level.vocabularySections.map((section) => ({
+      name: `${section.name} (${level.code})`,
+      description: section.description,
+      path: `/lessons/vocabulary/${level.code.toLowerCase()}/${section.slug}`
+    }))
+  );
 
   return (
     <div className="min-h-screen bg-exam-50">
       <PublicHeader signedIn={Boolean(user)} />
+      <JsonLd
+        id="vocabulary-hub-structured-data"
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "French vocabulary", path: "/lessons" }
+          ]),
+          buildItemListJsonLd(sectionItems)
+        ]}
+      />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6">
           <p className="text-xs font-bold uppercase tracking-wide text-exam-700">

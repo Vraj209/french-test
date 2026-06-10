@@ -19,11 +19,8 @@ export function AppShell({ user, children }: AppShellProps) {
             <span className="flex h-10 w-10 items-center justify-center rounded-md bg-exam-700 text-white">
               <GraduationCap size={21} aria-hidden="true" />
             </span>
-            <span className="min-w-0">
-              <span className="block text-sm font-bold uppercase tracking-wide text-ink-950">
-                French Test AI
-              </span>
-              <span className="block text-xs text-ink-600">TEF/TCF exam practice</span>
+            <span className="min-w-0 leading-none">
+              <span className="brand-wordmark block text-2xl text-ink-950">Francivo</span>
             </span>
           </Link>
           <nav

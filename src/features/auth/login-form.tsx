@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldError, Input, Label } from "@/components/ui/form";
+import { PasswordInput } from "@/features/auth/password-input";
 
 export function LoginForm() {
   const router = useRouter();
@@ -45,10 +46,9 @@ export function LoginForm() {
       </div>
       <div>
         <Label htmlFor="password">Password</Label>
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           minLength={8}
           autoComplete="current-password"
           required

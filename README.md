@@ -1,4 +1,4 @@
-# French Test AI
+# Francivo
 
 A production-oriented Next.js App Router application for AI-generated TEF Canada, TCF Canada, General TEF, General TCF, and CEFR French practice from A1 to B2.
 

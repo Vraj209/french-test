@@ -24,11 +24,10 @@ select {
   font: inherit;
 }
 
-.exam-grid {
-  background-image:
-    linear-gradient(rgba(30, 58, 138, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30, 58, 138, 0.06) 1px, transparent 1px);
-  background-size: 28px 28px;
+.brand-wordmark {
+  font-family: "Segoe Script", "Apple Chancery", "Bradley Hand", "Brush Script MT", cursive;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
 .hero-ribbon-stage {

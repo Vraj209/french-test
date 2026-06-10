@@ -22,12 +22,21 @@ import {
 } from "lucide-react";
 import { PublicHeader } from "@/components/layout/public-header";
 import { getCurrentUser } from "@/lib/auth/session";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "French Test AI | TEF and TCF Practice",
+export const metadata: Metadata = buildMetadata({
+  title: "TEF Canada, TCF Canada, and NCLC 7 French Practice",
   description:
-    "Generate TEF Canada, TCF Canada, writing, speaking, grammar, and vocabulary practice with estimated scoring and AI feedback."
-};
+    "Practice TEF Canada, TCF Canada, French grammar, vocabulary, writing, speaking, and NCLC 7 preparation with estimated scoring and AI feedback.",
+  path: "/",
+  keywords: [
+    "TEF Canada practice",
+    "TCF Canada practice",
+    "NCLC 7 French",
+    "French grammar practice",
+    "TEF preparation"
+  ]
+});
 
 type HomeCard = {
   title: string;
@@ -175,6 +184,49 @@ const resourceLinks: PracticeMode[] = [
   }
 ];
 
+const guideLinks: PracticeMode[] = [
+  {
+    title: "TEF Canada guide",
+    description:
+      "Understand TEF Canada sections, NCLC-focused preparation, and how to start targeted practice.",
+    href: "/tef-canada",
+    meta: ["TEF Canada", "NCLC"],
+    icon: GraduationCap
+  },
+  {
+    title: "TCF Canada guide",
+    description:
+      "Review TCF Canada structure, Canada immigration use cases, and section-by-section practice.",
+    href: "/tcf-canada",
+    meta: ["TCF Canada", "Immigration"],
+    icon: Headphones
+  },
+  {
+    title: "NCLC 7 French guide",
+    description:
+      "Get a direct study path for learners asking how to reach NCLC 7 in French.",
+    href: "/nclc-7-french",
+    meta: ["NCLC 7", "B2 target"],
+    icon: Trophy
+  },
+  {
+    title: "TEF preparation plan",
+    description:
+      "Follow a focused TEF preparation plan for writing, speaking, grammar, and mock practice.",
+    href: "/tef-preparation",
+    meta: ["Study plan", "TEF"],
+    icon: ClipboardCheck
+  },
+  {
+    title: "Learn French hub",
+    description:
+      "Build French foundations with grammar, vocabulary, listening, reading, and exam practice.",
+    href: "/learn-french",
+    meta: ["A1-B2", "Foundations"],
+    icon: BookOpenCheck
+  }
+];
+
 const previewRows = [
   { label: "Exam", value: "TEF Canada - Writing B" },
   { label: "Level", value: "B2 / NCLC 7 target" },
@@ -198,8 +250,8 @@ export default async function HomePage() {
             <span className="hero-ribbon hero-ribbon-green" />
             <span className="hero-ribbon hero-ribbon-light" />
           </div>
-          <div className="relative z-10 mx-auto flex w-full min-w-0 flex-col justify-center px-4 py-12 sm:px-6 lg:px-12 lg:py-16">
-            <div className="min-w-0 max-w-7xl">
+          <div className="relative z-10 mx-auto flex w-full max-w-7xl min-w-0 flex-col justify-center px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+            <div className="min-w-0">
               <p className="text-xs font-bold uppercase tracking-wide text-exam-700 sm:text-sm">
                 TEF Canada and TCF Canada preparation
               </p>
@@ -324,6 +376,66 @@ export default async function HomePage() {
                 <p className="mt-1 text-sm text-ink-600">{stat.label}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="border-y border-exam-100 bg-white">
+          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+            <div className="mb-6 max-w-3xl">
+              <p className="text-xs font-bold uppercase tracking-wide text-exam-700">
+                Exam preparation guides
+              </p>
+              <h2 className="mt-1 text-2xl font-bold text-ink-950">
+                Start with the guide that matches your French goal
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-ink-600">
+                These public guides answer common TEF, TCF, NCLC 7, and French
+                learning questions before you create a free practice account.
+              </p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+              {guideLinks.map((guide) => {
+                const Icon = guide.icon;
+
+                return (
+                  <Link
+                    key={guide.title}
+                    href={guide.href}
+                    className="group flex min-h-56 flex-col justify-between rounded-lg border border-exam-100 bg-white p-5 shadow-panel transition hover:-translate-y-0.5 hover:border-exam-500 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-exam-500 focus:ring-offset-2"
+                  >
+                    <span>
+                      <span className="flex items-start justify-between gap-4">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-md bg-exam-50 text-exam-700 ring-1 ring-exam-100 group-hover:bg-white">
+                          <Icon size={21} aria-hidden="true" />
+                        </span>
+                        <ArrowRight
+                          className="mt-1 text-ink-600 transition group-hover:translate-x-1 group-hover:text-exam-700"
+                          size={18}
+                          aria-hidden="true"
+                        />
+                      </span>
+                      <span className="mt-4 block text-base font-bold text-ink-950">
+                        {guide.title}
+                      </span>
+                      <span className="mt-2 block text-sm leading-6 text-ink-600">
+                        {guide.description}
+                      </span>
+                    </span>
+                    <span className="mt-5 flex flex-wrap gap-2">
+                      {guide.meta.map((item) => (
+                        <span
+                          key={item}
+                          className="rounded-md border border-exam-100 bg-exam-50 px-2.5 py-1 text-xs font-semibold text-ink-800"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </section>
 
