@@ -277,6 +277,57 @@ export const evaluationResultSchema = z.object({
   questionEvaluations: z.array(questionEvaluationSchema)
 });
 
+export const writingPracticeSectionSchema = z.enum([
+  "SENTENCE_BUILDING",
+  "TOPIC_PARAGRAPH",
+  "TEF_TASK_1",
+  "TEF_TASK_2"
+]);
+
+export const writingPracticeGenerationRequestSchema = z.object({
+  section: writingPracticeSectionSchema,
+  level: cefrLevelSchema.default("B1"),
+  difficulty: difficultySchema.default("MEDIUM"),
+  topic: z.string().trim().min(2).max(80).optional()
+});
+
+export const writingPracticePromptSchema = z.object({
+  title: z.string().trim().min(3).max(120),
+  section: writingPracticeSectionSchema,
+  level: cefrLevelSchema,
+  topic: z.string().trim().min(2).max(80),
+  taskType: z.string().trim().min(2).max(80),
+  prompt: z.string().trim().min(10),
+  instructions: z.string().trim().min(10),
+  writingGoal: z.string().trim().min(10),
+  minWords: z.number().int().positive().nullable(),
+  suggestedStructure: z.array(z.string().trim().min(2)).min(1),
+  vocabularyHints: z.array(z.string().trim().min(1)).min(1),
+  evaluationCriteria: z.array(z.string().trim().min(2)).min(1)
+});
+
+export const writingPracticeEvaluationRequestSchema = z.object({
+  testId: z.string().min(1),
+  questionId: z.string().min(1),
+  answerText: z.string().trim().min(1)
+});
+
+export const writingPracticeFeedbackSchema = z.object({
+  score: z.number().min(0).max(100),
+  estimatedLevel: z.string().trim().min(2),
+  mainMistakes: z.array(z.string().trim().min(2)).default([]),
+  improvementAdvice: z.array(z.string().trim().min(2)).default([]),
+  structureAdvice: z.array(z.string().trim().min(2)).default([]),
+  vocabularySuggestions: z.array(z.string().trim().min(1)).default([]),
+  correctedVersion: z.string().trim().min(1),
+  modelAnswer: z.string().trim().min(1),
+  writingStrategy: z.string().trim().min(1),
+  strongPoints: z.array(z.string().trim().min(2)).default([]),
+  weakPoints: z.array(z.string().trim().min(2)).default([]),
+  grammarFocus: z.array(z.string().trim().min(2)).default([]),
+  vocabularyToLearn: z.array(z.string().trim().min(1)).default([])
+});
+
 export type CefrLevel = z.infer<typeof cefrLevelSchema>;
 export type Difficulty = z.infer<typeof difficultySchema>;
 export type ExamType = z.infer<typeof examTypeSchema>;
@@ -292,3 +343,12 @@ export type AnswerSubmission = z.infer<typeof answerSubmissionSchema>;
 export type OcrResult = z.infer<typeof ocrResultSchema>;
 export type EvaluationResult = z.infer<typeof evaluationResultSchema>;
 export type QuestionEvaluation = z.infer<typeof questionEvaluationSchema>;
+export type WritingPracticeSection = z.infer<typeof writingPracticeSectionSchema>;
+export type WritingPracticeGenerationRequest = z.infer<
+  typeof writingPracticeGenerationRequestSchema
+>;
+export type WritingPracticePrompt = z.infer<typeof writingPracticePromptSchema>;
+export type WritingPracticeEvaluationRequest = z.infer<
+  typeof writingPracticeEvaluationRequestSchema
+>;
+export type WritingPracticeFeedback = z.infer<typeof writingPracticeFeedbackSchema>;

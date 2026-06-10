@@ -5,9 +5,7 @@ import {
   ClipboardList,
   FileText,
   GraduationCap,
-  Headphones,
   Mic,
-  Shuffle
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { preparationModeLabels } from "@/lib/exam-catalog";
@@ -22,24 +20,17 @@ const modeCards: Array<{
   icon: typeof GraduationCap;
 }> = [
   {
-    mode: "TEF_CANADA_PRACTICE",
-    title: "TEF Canada Practice",
-    description: "Build reading, listening, writing, speaking, grammar, or vocabulary practice for TEF Canada.",
-    meta: ["TEF Canada", "NCLC target", "Exam sections"],
-    icon: GraduationCap
-  },
-  {
-    mode: "TCF_CANADA_PRACTICE",
-    title: "TCF Canada Practice",
-    description: "Generate progressive TCF Canada tasks across comprehension, written expression, and speaking.",
-    meta: ["TCF Canada", "Progressive", "39-item sections"],
-    icon: Headphones
+    mode: "CEFR_GRAMMAR",
+    title: "Grammar Practice",
+    description: "Target A1-B2 grammar concepts that matter most for TEF/TCF success.",
+    meta: ["A1-B2", "Grammar", "Diagnostics"],
+    icon: BookOpenCheck
   },
   {
     mode: "WRITING_PRACTICE",
     title: "Writing Practice",
-    description: "Focus on TEF writing A/B or TCF written-expression tasks with model answers and corrections.",
-    meta: ["Emails", "Opinions", "Model answers"],
+    description: "Use untimed sentence, paragraph, TEF Task 1, and TEF Task 2 practice with AI coaching.",
+    meta: ["Untimed", "Corrections", "Model answers"],
     icon: FileText
   },
   {
@@ -50,18 +41,11 @@ const modeCards: Array<{
     icon: Mic
   },
   {
-    mode: "CEFR_GRAMMAR",
-    title: "CEFR Grammar",
-    description: "Target A1-B2 grammar concepts that matter most for TEF/TCF success.",
-    meta: ["A1-B2", "Grammar", "Diagnostics"],
-    icon: BookOpenCheck
-  },
-  {
-    mode: "MIXED_GRAMMAR_VOCABULARY",
-    title: "Grammar + Vocabulary",
-    description: "Mix grammar topics with high-frequency TEF/TCF vocabulary themes.",
-    meta: ["Themes", "Weaknesses", "Mixed drills"],
-    icon: Shuffle
+    mode: "TEF_CANADA_PRACTICE",
+    title: "TEF Canada Practice",
+    description: "Build reading, listening, writing, speaking, grammar, or vocabulary practice for TEF Canada.",
+    meta: ["TEF Canada", "NCLC target", "Exam sections"],
+    icon: GraduationCap
   },
   {
     mode: "FULL_MOCK_EXAM",

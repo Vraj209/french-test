@@ -216,3 +216,74 @@ export const evaluationJsonSchema = {
     }
   }
 } as const;
+
+export const writingPracticePromptJsonSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "title",
+    "section",
+    "level",
+    "topic",
+    "taskType",
+    "prompt",
+    "instructions",
+    "writingGoal",
+    "minWords",
+    "suggestedStructure",
+    "vocabularyHints",
+    "evaluationCriteria"
+  ],
+  properties: {
+    title: { type: "string" },
+    section: {
+      type: "string",
+      enum: ["SENTENCE_BUILDING", "TOPIC_PARAGRAPH", "TEF_TASK_1", "TEF_TASK_2"]
+    },
+    level: { type: "string", enum: ["A1", "A2", "B1", "B2"] },
+    topic: { type: "string" },
+    taskType: { type: "string" },
+    prompt: { type: "string" },
+    instructions: { type: "string" },
+    writingGoal: { type: "string" },
+    minWords: { type: ["integer", "null"] },
+    suggestedStructure: { type: "array", items: { type: "string" } },
+    vocabularyHints: { type: "array", items: { type: "string" } },
+    evaluationCriteria: { type: "array", items: { type: "string" } }
+  }
+} as const;
+
+export const writingPracticeFeedbackJsonSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "score",
+    "estimatedLevel",
+    "mainMistakes",
+    "improvementAdvice",
+    "structureAdvice",
+    "vocabularySuggestions",
+    "correctedVersion",
+    "modelAnswer",
+    "writingStrategy",
+    "strongPoints",
+    "weakPoints",
+    "grammarFocus",
+    "vocabularyToLearn"
+  ],
+  properties: {
+    score: { type: "number", minimum: 0, maximum: 100 },
+    estimatedLevel: { type: "string" },
+    mainMistakes: { type: "array", items: { type: "string" } },
+    improvementAdvice: { type: "array", items: { type: "string" } },
+    structureAdvice: { type: "array", items: { type: "string" } },
+    vocabularySuggestions: { type: "array", items: { type: "string" } },
+    correctedVersion: { type: "string" },
+    modelAnswer: { type: "string" },
+    writingStrategy: { type: "string" },
+    strongPoints: { type: "array", items: { type: "string" } },
+    weakPoints: { type: "array", items: { type: "string" } },
+    grammarFocus: { type: "array", items: { type: "string" } },
+    vocabularyToLearn: { type: "array", items: { type: "string" } }
+  }
+} as const;

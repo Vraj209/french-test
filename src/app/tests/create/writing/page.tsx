@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
-import { TestModeSelection } from "@/features/tests/test-mode-selection";
+import { WritingPreparationDashboard } from "@/features/writing-practice/writing-preparation-dashboard";
 import { getCurrentUser } from "@/lib/auth/session";
 
-export default async function CreateTestPage() {
+export default async function WritingPreparationPage() {
   const user = await getCurrentUser();
 
   if (!user) {
@@ -12,7 +12,7 @@ export default async function CreateTestPage() {
 
   return (
     <AppShell user={user}>
-      <TestModeSelection />
+      <WritingPreparationDashboard />
     </AppShell>
   );
 }

@@ -57,7 +57,6 @@ const examTypes: ExamType[] = ["CEFR_PRACTICE", "TEF_CANADA"];
 const preparationModes: PreparationMode[] = [
   "CEFR_GRAMMAR",
   "FULL_MOCK_EXAM",
-  "WRITING_PRACTICE",
   "SPEAKING_PRACTICE"
 ];
 const skillFocuses = Object.keys(skillFocusShortLabels) as SkillFocus[];
@@ -165,6 +164,7 @@ type WizardStepId = (typeof wizardSteps)[number]["id"];
 type TestBuilderProps = {
   initialPreparationMode?: PreparationMode;
   showPreparationModePicker?: boolean;
+  skipTestTypeStep?: boolean;
 };
 
 async function fetchCatalog(): Promise<CatalogResponse> {
@@ -394,7 +394,8 @@ function initialBuilderState(preparationMode: PreparationMode): TestBuilderState
 
 export function TestBuilder({
   initialPreparationMode = "CEFR_GRAMMAR",
-  showPreparationModePicker = true
+  showPreparationModePicker = true,
+  skipTestTypeStep = false
 }: TestBuilderProps) {
   const router = useRouter();
   const catalogQuery = useQuery({
@@ -404,7 +405,9 @@ export function TestBuilder({
   const [state, setState] = useState<TestBuilderState>(() =>
     initialBuilderState(initialPreparationMode)
   );
-  const [currentStepId, setCurrentStepId] = useState<WizardStepId>("type");
+  const [currentStepId, setCurrentStepId] = useState<WizardStepId>(
+    skipTestTypeStep ? "level" : "type"
+  );
   const [topicSearchQuery, setTopicSearchQuery] = useState("");
   const [collapsedGrammarLevelCodes, setCollapsedGrammarLevelCodes] = useState<CefrLevel[]>([]);
   const examPreset = getExamPreset(state.examType);
@@ -414,13 +417,13 @@ export function TestBuilder({
   const questionFocusOptions = questionFocusesForSkill(state.skillFocus);
   const isGrammarTopicFirstMode = state.preparationMode === "CEFR_GRAMMAR";
   const shouldAskGrammarTopics = isGrammarTopicFirstMode;
-  const activeWizardSteps = useMemo(
-    () =>
-      shouldAskGrammarTopics
-        ? wizardSteps
-        : wizardSteps.filter((step) => step.id !== "topics"),
-    [shouldAskGrammarTopics]
-  );
+  const activeWizardSteps = useMemo(() => {
+    const steps = shouldAskGrammarTopics
+      ? wizardSteps
+      : wizardSteps.filter((step) => step.id !== "topics");
+
+    return skipTestTypeStep ? steps.filter((step) => step.id !== "type") : steps;
+  }, [shouldAskGrammarTopics, skipTestTypeStep]);
   const catalogLevels = useMemo(() => catalogQuery.data?.levels ?? [], [catalogQuery.data?.levels]);
   const allGrammarTopics = useMemo(
     () => catalogLevels.flatMap((level) => level.grammarTopics),
@@ -523,7 +526,7 @@ export function TestBuilder({
   );
   const activeStepId = activeWizardSteps.some((step) => step.id === currentStepId)
     ? currentStepId
-    : "vocabulary";
+    : (activeWizardSteps[0]?.id ?? "overview");
   const currentStepIndex = Math.max(
     0,
     activeWizardSteps.findIndex((step) => step.id === activeStepId)
@@ -962,6 +965,7 @@ export function TestBuilder({
   }
 
   const canSubmit =
+    state.title.trim().length >= 3 &&
     selectedGrammarTopicIds.length > 0 &&
     selectedVocabularySectionIds.length > 0 &&
     state.examSections.length > 0 &&

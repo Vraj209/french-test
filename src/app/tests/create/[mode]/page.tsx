@@ -27,6 +27,7 @@ export default async function CreateTestModePage({ params }: PageProps) {
       <TestBuilder
         initialPreparationMode={preparationMode}
         showPreparationModePicker={false}
+        skipTestTypeStep={preparationMode === "CEFR_GRAMMAR"}
       />
     </AppShell>
   );

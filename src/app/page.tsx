@@ -93,9 +93,9 @@ const practiceModes: PracticeMode[] = [
   {
     title: "Writing",
     description:
-      "Practice TEF section A/B and TCF written-expression tasks with corrections.",
+      "Build sentences, paragraphs, TEF Task 1, and TEF Task 2 responses with untimed coaching.",
     href: "/tests/create/writing",
-    meta: ["Model answers", "Structure"],
+    meta: ["Untimed", "Model answers"],
     icon: PenLine
   },
   {
@@ -109,7 +109,7 @@ const practiceModes: PracticeMode[] = [
   {
     title: "Grammar",
     description:
-      "Target CEFR grammar topics that affect comprehension, writing, and speaking.",
+      "Target grammar topics that affect comprehension, writing, and speaking.",
     href: "/tests/create/cefr-grammar",
     meta: ["A1-B2", "Diagnostics"],
     icon: BookOpenCheck
@@ -154,7 +154,7 @@ const feedbackItems: HomeCard[] = [
 const resourceLinks: PracticeMode[] = [
   {
     title: "Grammar catalog",
-    description: "Browse CEFR topics by level and review weak structures.",
+    description: "Browse topics by level and review weak structures.",
     href: "/grammar",
     meta: ["A1", "A2", "B1", "B2"],
     icon: LibraryBig

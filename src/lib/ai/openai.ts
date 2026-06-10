@@ -3,17 +3,25 @@ import {
   evaluationResultSchema,
   generatedTestSchema,
   ocrResultSchema,
+  writingPracticeFeedbackSchema,
+  writingPracticePromptSchema,
   type AnswerSubmission,
   type EvaluationResult,
   type GeneratedTest,
   type OcrResult,
-  type TestGenerationRequest
+  type TestGenerationRequest,
+  type WritingPracticeFeedback,
+  type WritingPracticeGenerationRequest,
+  type WritingPracticePrompt,
+  type WritingPracticeSection
 } from "@/lib/schemas";
 import { getOpenAIConfig } from "@/lib/env";
 import {
   evaluationJsonSchema,
   generatedTestJsonSchema,
-  ocrJsonSchema
+  ocrJsonSchema,
+  writingPracticeFeedbackJsonSchema,
+  writingPracticePromptJsonSchema
 } from "@/lib/ai/json-schemas";
 import { getExamPreset, getSectionsForExam } from "@/lib/exam-presets";
 import { writingSpeakingEvaluationCriteria } from "@/lib/exam-catalog";
@@ -322,6 +330,131 @@ export async function generateTestWithAI({
   });
 
   return generatedTestSchema.parse(JSON.parse(jsonTextFromResponse(response)));
+}
+
+function writingPracticeSectionGuide(section: WritingPracticeSection) {
+  if (section === "SENTENCE_BUILDING") {
+    return [
+      "Create a short sentence-building practice prompt.",
+      "The learner should write one to three French sentences.",
+      "Focus on sentence order, conjugation, agreement, connectors, clear vocabulary, and common French writing patterns.",
+      "Do not create a full paragraph or exam task."
+    ].join(" ");
+  }
+
+  if (section === "TOPIC_PARAGRAPH") {
+    return [
+      "Create a topic-based body paragraph practice prompt.",
+      "The learner should write one developed body paragraph for TEF/TCF-style writing.",
+      "Focus on a topic sentence, one argument, a concrete example, connectors, vocabulary, and a closing sentence.",
+      "Do not ask for a full essay introduction or conclusion."
+    ].join(" ");
+  }
+
+  if (section === "TEF_TASK_1") {
+    return [
+      "Create a TEF Expression Ecrite Task 1 practice prompt.",
+      "The learner should write a short practical message, email, invitation, request, complaint, or response.",
+      "Focus on task completion, clear purpose, appropriate tone, simple organization, grammar, vocabulary, and clarity.",
+      "This is guided practice, not a timed exam."
+    ].join(" ");
+  }
+
+  return [
+    "Create a TEF Expression Ecrite Task 2 practice prompt.",
+    "The learner should write an opinion-based or argument-based response.",
+    "Focus on introduction, body paragraphs, arguments, examples, concessions, conclusion, connectors, vocabulary range, grammar accuracy, and exam relevance.",
+    "This is guided practice, not a timed exam."
+  ].join(" ");
+}
+
+export async function generateWritingPracticePromptWithAI(
+  request: WritingPracticeGenerationRequest
+): Promise<WritingPracticePrompt> {
+  const { openai, testModel } = client();
+  const topic = request.topic || "TEF/TCF everyday writing";
+  const prompt = [
+    "You are an expert French writing coach for TEF and TCF preparation.",
+    "Create one original untimed writing practice prompt.",
+    "Return only valid JSON matching the schema.",
+    "Do not include markdown or text outside JSON.",
+    "This is not a full mock exam. Do not include a countdown, time limit, strict exam duration, or official-score claim.",
+    "",
+    "REQUEST:",
+    `Section: ${request.section}`,
+    `CEFR level: ${request.level}`,
+    `Difficulty: ${request.difficulty}`,
+    `Requested topic or task type: ${topic}`,
+    `Section guide: ${writingPracticeSectionGuide(request.section)}`,
+    "",
+    "OUTPUT RULES:",
+    "The prompt field should be learner-facing and written mainly in French.",
+    "The instructions, writingGoal, suggestedStructure, vocabularyHints, and evaluationCriteria fields should be clear English coaching text.",
+    "Keep the task achievable at the requested CEFR level, capped at B2+.",
+    "Use realistic TEF/TCF themes such as education, work, technology, environment, transportation, health, immigration, social media, family, and daily life.",
+    "For Sentence Building, minWords must be null.",
+    "For Topic Paragraph, minWords should normally be 70 to 120.",
+    "For TEF Task 1, minWords should normally be 60 to 100.",
+    "For TEF Task 2, minWords should normally be 180 to 220.",
+    "Provide 4 to 6 suggestedStructure items.",
+    "Provide 5 to 8 vocabularyHints, including connectors where useful.",
+    "Provide evaluationCriteria that match the section-specific coaching focus.",
+    "All content must be original and must not copy official exams or copyrighted materials."
+  ].join("\n");
+
+  const response = await openai.responses.create({
+    model: testModel,
+    input: prompt,
+    text: responseFormat("writing_practice_prompt", writingPracticePromptJsonSchema)
+  });
+
+  return writingPracticePromptSchema.parse(JSON.parse(jsonTextFromResponse(response)));
+}
+
+export async function evaluateWritingPracticeAnswerWithAI({
+  prompt,
+  answerText
+}: {
+  prompt: WritingPracticePrompt;
+  answerText: string;
+}): Promise<WritingPracticeFeedback> {
+  const { openai, testModel } = client();
+  const request = [
+    "You are an expert French writing coach for TEF and TCF preparation.",
+    "Review the learner's writing as guided practice, not as a timed test.",
+    "Return only valid JSON matching the schema.",
+    "Do not include markdown or text outside JSON.",
+    "Give direct, useful coaching in simple English. French examples and corrected text should be natural French.",
+    "Do not claim the score is official TEF, TCF, CLB, or NCLC.",
+    "",
+    "FEEDBACK MUST INCLUDE:",
+    "Main mistakes: grammar, conjugation, agreement, word choice, spelling, clarity, and relevance.",
+    "How to improve: concrete rewriting advice.",
+    "Better structure: how to organize the sentence, paragraph, email, or opinion response.",
+    "Vocabulary suggestions: stronger words, connectors, expressions, and topic-specific phrases.",
+    "Corrected version: a cleaned-up version of the learner answer.",
+    "Stronger sample answer: a model answer at the same level and for the same prompt.",
+    "Writing strategy: how to approach this task next time.",
+    "",
+    `Practice prompt: ${JSON.stringify(prompt)}`,
+    `Learner answer: ${answerText}`,
+    "",
+    "SCORING:",
+    "Use score as a 0-100 guided-practice estimate only.",
+    "Be encouraging but specific. If the answer is short or incomplete, say exactly what is missing.",
+    "For TEF Task 2, comment on argument development, examples, concession, conclusion, and connectors.",
+    "For TEF Task 1, comment on tone, structure, practical task completion, and clarity.",
+    "For Topic Paragraph, comment on topic sentence, argument, example, connector use, and paragraph unity.",
+    "For Sentence Building, comment on word order, conjugation, agreement, connector choice, and sentence clarity."
+  ].join("\n");
+
+  const response = await openai.responses.create({
+    model: testModel,
+    input: request,
+    text: responseFormat("writing_practice_feedback", writingPracticeFeedbackJsonSchema)
+  });
+
+  return writingPracticeFeedbackSchema.parse(JSON.parse(jsonTextFromResponse(response)));
 }
 
 export async function extractAnswerTextFromImage(imageUrl: string): Promise<OcrResult> {
