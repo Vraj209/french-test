@@ -406,6 +406,7 @@ export function TestBuilder({
   );
   const [currentStepId, setCurrentStepId] = useState<WizardStepId>("type");
   const [topicSearchQuery, setTopicSearchQuery] = useState("");
+  const [collapsedGrammarLevelCodes, setCollapsedGrammarLevelCodes] = useState<CefrLevel[]>([]);
   const examPreset = getExamPreset(state.examType);
   const selectedSectionPresets = examPreset.sections.filter((section) =>
     state.examSections.includes(section.id)
@@ -446,6 +447,10 @@ export function TestBuilder({
   const selectedGrammarTopicIdSet = useMemo(
     () => new Set(selectedGrammarTopicIds),
     [selectedGrammarTopicIds]
+  );
+  const collapsedGrammarLevelCodeSet = useMemo(
+    () => new Set(collapsedGrammarLevelCodes),
+    [collapsedGrammarLevelCodes]
   );
   const selectedGrammarTopicLevels = useMemo(
     () => Array.from(new Set(selectedGrammarTopics.map((topic) => topic.levelCode))),
@@ -766,6 +771,14 @@ export function TestBuilder({
 
       return nextStateForGrammarTopicSelection(value, Array.from(selected));
     });
+  }
+
+  function toggleGrammarLevelCollapse(levelCode: CefrLevel) {
+    setCollapsedGrammarLevelCodes((value) =>
+      value.includes(levelCode)
+        ? value.filter((code) => code !== levelCode)
+        : [...value, levelCode]
+    );
   }
 
   function toggleExamSection(section: ExamSection) {
@@ -1341,15 +1354,42 @@ export function TestBuilder({
                       />
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 md:justify-end">
                     <Badge>
                       {visibleGrammarTopicCount}{" "}
                       {visibleGrammarTopicCount === 1 ? "match" : "matches"}
                     </Badge>
+                    {isGrammarTopicFirstMode ? (
+                      <>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          className="h-8 px-3 text-xs"
+                          disabled={filteredCatalogLevels.length === 0}
+                          onClick={() => setCollapsedGrammarLevelCodes([])}
+                        >
+                          Expand all
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          className="h-8 px-3 text-xs"
+                          disabled={filteredCatalogLevels.length === 0}
+                          onClick={() =>
+                            setCollapsedGrammarLevelCodes(
+                              filteredCatalogLevels.map((level) => level.code)
+                            )
+                          }
+                        >
+                          Collapse all
+                        </Button>
+                      </>
+                    ) : null}
                     {topicSearchQuery ? (
                       <Button
                         type="button"
                         variant="secondary"
+                        className="h-8 px-3 text-xs"
                         onClick={() => setTopicSearchQuery("")}
                       >
                         Clear
@@ -1370,19 +1410,48 @@ export function TestBuilder({
                       const areAllLevelTopicsSelected =
                         levelTopicIds.length > 0 &&
                         selectedLevelTopicCount === levelTopicIds.length;
+                      const isLevelCollapsed = collapsedGrammarLevelCodeSet.has(level.code);
+                      const grammarLevelPanelId = `grammar-level-${level.code.toLowerCase()}-topics`;
+                      const topicCountLabel = normalizedTopicSearchQuery
+                        ? `${level.grammarTopics.length} ${
+                            level.grammarTopics.length === 1 ? "match" : "matches"
+                          } in this level.`
+                        : `${levelTopicIds.length} ${
+                            levelTopicIds.length === 1 ? "topic" : "topics"
+                          } in this level.`;
 
                       return (
                         <div
                           key={level.id}
                           className="rounded-md border border-exam-100 bg-exam-50 p-3"
                         >
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <div>
-                              <p className="text-sm font-bold text-ink-950">{level.name}</p>
-                              <p className="text-xs text-ink-600">
-                                Select one or more grammar topics from this level.
-                              </p>
-                            </div>
+                          <div className="flex flex-wrap items-start justify-between gap-2">
+                            <button
+                              type="button"
+                              className="flex min-w-0 flex-1 items-start gap-2 rounded-md p-1 text-left transition hover:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-exam-500"
+                              aria-expanded={!isLevelCollapsed}
+                              aria-controls={grammarLevelPanelId}
+                              onClick={() => toggleGrammarLevelCollapse(level.code)}
+                            >
+                              <ChevronRight
+                                className={cn(
+                                  "mt-0.5 shrink-0 text-exam-700 transition-transform",
+                                  !isLevelCollapsed && "rotate-90"
+                                )}
+                                size={18}
+                                aria-hidden="true"
+                              />
+                              <span className="min-w-0">
+                                <span className="block text-sm font-bold text-ink-950">
+                                  {level.name}
+                                </span>
+                                <span className="block text-xs text-ink-600">
+                                  {isLevelCollapsed
+                                    ? topicCountLabel
+                                    : "Select one or more grammar topics from this level."}
+                                </span>
+                              </span>
+                            </button>
                             <div className="flex flex-wrap items-center gap-2">
                               <Badge>
                                 {selectedLevelTopicCount}/{levelTopicIds.length} selected
@@ -1401,27 +1470,34 @@ export function TestBuilder({
                               </Button>
                             </div>
                           </div>
-                          <div className="mt-3 grid gap-2 md:grid-cols-2">
-                            {level.grammarTopics.map((topic) => (
-                              <label
-                                key={topic.id}
-                                className="flex cursor-pointer gap-3 rounded-md border border-exam-100 bg-white p-3 text-sm hover:bg-white/70"
-                              >
-                                <input
-                                  type="checkbox"
-                                  className="mt-1 rounded border-exam-100 text-exam-700 focus:ring-exam-500"
-                                  checked={selectedGrammarTopicIdSet.has(topic.id)}
-                                  onChange={() => toggleGrammarTopic(topic.id)}
-                                />
-                                <span>
-                                  <span className="font-semibold text-ink-950">{topic.name}</span>
-                                  <span className="mt-1 block text-xs leading-5 text-ink-600">
-                                    {topic.description}
+                          {!isLevelCollapsed ? (
+                            <div
+                              id={grammarLevelPanelId}
+                              className="mt-3 grid gap-2 md:grid-cols-2"
+                            >
+                              {level.grammarTopics.map((topic) => (
+                                <label
+                                  key={topic.id}
+                                  className="flex cursor-pointer gap-3 rounded-md border border-exam-100 bg-white p-3 text-sm hover:bg-white/70"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    className="mt-1 rounded border-exam-100 text-exam-700 focus:ring-exam-500"
+                                    checked={selectedGrammarTopicIdSet.has(topic.id)}
+                                    onChange={() => toggleGrammarTopic(topic.id)}
+                                  />
+                                  <span>
+                                    <span className="font-semibold text-ink-950">
+                                      {topic.name}
+                                    </span>
+                                    <span className="mt-1 block text-xs leading-5 text-ink-600">
+                                      {topic.description}
+                                    </span>
                                   </span>
-                                </span>
-                              </label>
-                            ))}
-                          </div>
+                                </label>
+                              ))}
+                            </div>
+                          ) : null}
                         </div>
                       );
                     })}
