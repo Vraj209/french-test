@@ -44,7 +44,7 @@ const resourceSections: ResourceSection[] = [
     description: "Grammar review, vocabulary drills, conjugation help, and structured practice.",
     icon: LibraryBig,
     resources: [
-      { name: "Clozemaster French", href: "https://www.clozemaster.com/l/fra-eng/intermediate-french-resources", domain: "clozemaster.com" },
+      { name: "Clozemaster French", href: "https://www.clozemaster.com/l/fra-eng/", domain: "clozemaster.com" },
       { name: "Babadum", href: "https://babadum.com/", domain: "babadum.com" },
       { name: "French Today", href: "https://www.frenchtoday.com/", domain: "frenchtoday.com" },
       { name: "Knoword French", href: "https://knoword.com/packs?language=fr", domain: "knoword.com" },
@@ -59,6 +59,7 @@ const resourceSections: ResourceSection[] = [
     icon: Languages,
     resources: [
       { name: "Lingopie French", href: "https://lingopie.com/app/catalog/french", domain: "lingopie.com" },
+      { name: "LingQ", href: "https://www.lingq.com/?referral=vrajpanchal", domain: "lingq.com" },
       { name: "Language Reactor", href: "https://www.languagereactor.com/", domain: "languagereactor.com" }
     ]
   },
@@ -67,7 +68,6 @@ const resourceSections: ResourceSection[] = [
     description: "Business French, longer courses, grammar books, and additional study platforms.",
     icon: Sparkles,
     resources: [
-      { name: "LingQ", href: "https://www.lingq.com/?referral=vrajpanchal", domain: "lingq.com" },
       { name: "Le Francais des Affaires", href: "https://www.lefrancaisdesaffaires.fr/", domain: "lefrancaisdesaffaires.fr" },
       { name: "The Perfect French Grammar", href: "https://theperfectfrench.com/french-courses-book/complete-french-grammar/", domain: "theperfectfrench.com" },
       { name: "Learn French with Clemence", href: "https://www.learnfrenchwithclemence.com/course-curriculum", domain: "learnfrenchwithclemence.com" }
