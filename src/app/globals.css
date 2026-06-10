@@ -30,3 +30,127 @@ select {
     linear-gradient(90deg, rgba(30, 58, 138, 0.06) 1px, transparent 1px);
   background-size: 28px 28px;
 }
+
+.hero-ribbon-stage {
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgba(248, 251, 255, 0.94) 0%, #ffffff 44%, #f8fbff 100%);
+}
+
+.hero-ribbon-stage::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  z-index: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(30, 58, 138, 0.2), transparent);
+  content: "";
+}
+
+.hero-ribbon-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-ribbon-field::before {
+  position: absolute;
+  top: -32rem;
+  right: -18rem;
+  width: min(86rem, 92vw);
+  height: 58rem;
+  transform: rotate(33deg);
+  background:
+    linear-gradient(90deg, rgba(248, 251, 255, 0) 0%, rgba(248, 251, 255, 0.86) 42%, rgba(248, 251, 255, 0) 72%),
+    linear-gradient(130deg, rgba(30, 58, 138, 0.08), rgba(220, 38, 38, 0.12), rgba(10, 100, 72, 0.08));
+  filter: blur(18px);
+  content: "";
+}
+
+.hero-ribbon {
+  position: absolute;
+  display: block;
+  width: min(82rem, 88vw);
+  height: 16rem;
+  transform-origin: 70% 50%;
+  border-radius: 999px;
+  opacity: 0.86;
+  mix-blend-mode: multiply;
+  filter: blur(0.5px);
+  animation: hero-ribbon-drift 12s ease-in-out infinite alternate;
+}
+
+.hero-ribbon-blue {
+  top: -1.5rem;
+  right: -25rem;
+  transform: rotate(39deg);
+  background: linear-gradient(90deg, rgba(248, 251, 255, 0), rgba(30, 58, 138, 0.2) 18%, rgba(30, 58, 138, 0.55) 58%, rgba(248, 251, 255, 0));
+}
+
+.hero-ribbon-red {
+  top: 5.5rem;
+  right: -23rem;
+  height: 18rem;
+  transform: rotate(35deg);
+  background: linear-gradient(90deg, rgba(248, 251, 255, 0), rgba(220, 38, 38, 0.18) 16%, rgba(220, 38, 38, 0.5) 56%, rgba(248, 251, 255, 0));
+  animation-delay: -3s;
+}
+
+.hero-ribbon-green {
+  top: 14rem;
+  right: -28rem;
+  height: 13rem;
+  transform: rotate(42deg);
+  background: linear-gradient(90deg, rgba(248, 251, 255, 0), rgba(10, 100, 72, 0.12) 18%, rgba(15, 139, 98, 0.3) 58%, rgba(248, 251, 255, 0));
+  animation-delay: -6s;
+}
+
+.hero-ribbon-light {
+  top: -4rem;
+  right: -31rem;
+  height: 28rem;
+  transform: rotate(47deg);
+  background: linear-gradient(90deg, rgba(248, 251, 255, 0), rgba(219, 231, 246, 0.42) 22%, rgba(255, 255, 255, 0.72) 66%, rgba(248, 251, 255, 0));
+  mix-blend-mode: normal;
+  animation-delay: -9s;
+}
+
+@keyframes hero-ribbon-drift {
+  from {
+    translate: 0 0;
+    scale: 1;
+  }
+
+  to {
+    translate: -1.5rem 1.1rem;
+    scale: 1.035;
+  }
+}
+
+@media (max-width: 1023px) {
+  .hero-ribbon {
+    right: -30rem;
+    width: 70rem;
+    opacity: 0.62;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-ribbon-field {
+    opacity: 0.52;
+  }
+
+  .hero-ribbon {
+    right: -34rem;
+    width: 62rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-ribbon {
+    animation: none;
+  }
+}

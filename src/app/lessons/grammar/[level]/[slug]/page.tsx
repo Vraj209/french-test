@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { PublicHeader } from "@/components/layout/public-header";
 import { Badge } from "@/components/ui/badge";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -26,6 +26,11 @@ function stringArray(value: unknown): string[] {
 
 export default async function GrammarCheatSheetPage({ params }: PageProps) {
   const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
   const { level: levelParam, slug } = await params;
   const level = parseLevel(levelParam);
 

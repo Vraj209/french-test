@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import {
   ArrowUpRight,
   BookOpenText,
@@ -65,6 +66,10 @@ export const metadata: Metadata = {
 
 export default async function QuizletPage() {
   const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
 
   return (
     <div className="min-h-screen bg-exam-50">

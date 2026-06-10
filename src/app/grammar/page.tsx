@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { PublicHeader } from "@/components/layout/public-header";
 import { Badge } from "@/components/ui/badge";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -7,6 +8,11 @@ import { prisma } from "@/lib/db";
 
 export default async function GrammarPage() {
   const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
   const levels = await prisma.level.findMany({
     orderBy: { code: "asc" },
     include: {

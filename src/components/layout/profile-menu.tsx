@@ -73,8 +73,8 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
         className={cn(
           "flex h-11 w-11 items-center justify-center rounded-full border text-sm font-semibold uppercase tracking-wide transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
           open
-            ? "border-exam-300 bg-exam-700 text-white focus-visible:outline-exam-500"
-            : "border-exam-100 bg-exam-50 text-exam-800 hover:border-exam-300 hover:bg-exam-100 focus-visible:outline-exam-500"
+            ? "border-red-700 bg-red-700 text-white focus-visible:outline-red-500"
+            : "border-red-600 bg-red-600 text-white hover:border-red-700 hover:bg-red-700 focus-visible:outline-red-500"
         )}
       >
         {initials}
@@ -87,7 +87,7 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
         >
           <div className="rounded-xl bg-exam-50/80 p-3">
             <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-exam-700 text-sm font-semibold uppercase tracking-wide text-white">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-red-600 text-sm font-semibold uppercase tracking-wide text-white">
                 {initials}
               </span>
               <div className="min-w-0">
