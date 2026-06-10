@@ -5,7 +5,10 @@ import "@/app/globals.css";
 
 export const metadata: Metadata = {
   title: "French Test AI",
-  description: "AI-powered TEF Canada and TCF Canada French exam practice from CEFR A1 to B2."
+  description: "AI-powered TEF Canada and TCF Canada French exam practice from CEFR A1 to B2.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }]
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

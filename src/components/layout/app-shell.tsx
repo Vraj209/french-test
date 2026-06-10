@@ -28,6 +28,18 @@ export function AppShell({ user, children }: AppShellProps) {
           </Link>
           <nav className="flex items-center gap-2">
             <Link
+              href="/resources"
+              className="hidden h-10 items-center gap-2 rounded-md px-3 text-sm font-semibold text-ink-800 hover:bg-exam-50 sm:inline-flex"
+            >
+              Resources
+            </Link>
+            <Link
+              href="/quizlet"
+              className="hidden h-10 items-center gap-2 rounded-md px-3 text-sm font-semibold text-ink-800 hover:bg-exam-50 sm:inline-flex"
+            >
+              Quizlet
+            </Link>
+            <Link
               href="/grammar"
               className="hidden h-10 items-center gap-2 rounded-md px-3 text-sm font-semibold text-ink-800 hover:bg-exam-50 sm:inline-flex"
             >
